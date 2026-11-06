@@ -668,6 +668,9 @@ table.tbl{border-collapse:collapse;width:100%;font-size:15px;min-width:480px}
   .swipe-hint{display:flex}
   .prods,.prods.p3{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .perks{top:-14px}
+  .filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;width:100%;padding-bottom:2px}
+  .filters::-webkit-scrollbar{display:none}
+  .filters button{flex:0 0 auto;padding:9px 13px;font-size:14px}
   .prod-in{padding:12px 12px 14px}
   .prod h3{font-size:15px}
   .prod .spec{font-size:13px;margin-bottom:10px}
