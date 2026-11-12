@@ -10,7 +10,7 @@
   var BASE=document.body.getAttribute('data-base')||'';
   var I=function(id){return '<svg class="ico" aria-hidden="true"><use href="#'+id+'"/></svg>'};
   var TX={
-    pl:{toShop:'Przejdź do sklepu',sent:'Dziękujemy{n}. To podgląd strony - formularz zacznie wysyłać wiadomości do biura po uruchomieniu na WordPressie.',added:'Dodano do koszyka',asked:'Dodano do zapytania',empty:'Koszyk jest pusty.',ask:'cena na zapytanie',pcs:'szt.',rm:'usuń',less:'Mniej',more:'Więcej',close:'Zamknij',prev:'Poprzednie',next:'Następne',total:'Razem',gross:'brutto',orderMsg:'To makieta zamówienia. Po uruchomieniu sklepu klient przejdzie tu do płatności (Przelewy24 lub PayU), a na e-mail dostanie potwierdzenie i kolejne statusy.'},
+    pl:{toShop:'Przejdź do sklepu',sent:'Dziękujemy{n}. To podgląd strony - formularz zacznie wysyłać wiadomości do biura po uruchomieniu na WordPressie.',added:'Dodano do koszyka',asked:'Dodano do zapytania',empty:'Koszyk jest pusty.',ask:'cena na zapytanie',pcs:'szt.',rm:'usuń',less:'Mniej',more:'Więcej',close:'Zamknij',prev:'Poprzednie',next:'Następne',total:'Razem',gross:'brutto',orderMsg:'To makieta zamówienia. Po uruchomieniu sklepu klient przejdzie tu do płatności (Planet Pay: BLIK, karta, Google Pay, Apple Pay, przelew online), a na e-mail dostanie potwierdzenie i kolejne statusy.'},
     en:{toShop:'Go to the shop',sent:'Thank you{n}. This is a preview - the form will start sending messages after launch on WordPress.',added:'Added to cart',asked:'Added to inquiry',empty:'Your cart is empty.',ask:'price on request',pcs:'pcs',rm:'remove',less:'Less',more:'More',close:'Close',prev:'Previous',next:'Next',total:'Total',gross:'gross',orderMsg:'This is a checkout mock-up. After launch the customer will be redirected to payment and receive e-mail confirmations and status updates.'},
     de:{toShop:'Zum Shop',sent:'Vielen Dank{n}. Dies ist eine Vorschau - das Formular sendet nach dem Start auf WordPress.',added:'In den Warenkorb gelegt',asked:'Zur Anfrage hinzugefügt',empty:'Der Warenkorb ist leer.',ask:'Preis auf Anfrage',pcs:'Stk.',rm:'entfernen',less:'Weniger',more:'Mehr',close:'Schließen',prev:'Zurück',next:'Weiter',total:'Summe',gross:'brutto',orderMsg:'Dies ist ein Muster der Bestellung. Nach dem Start folgt hier die Zahlung, Bestätigungen und Statusmeldungen kommen per E-Mail.'}
   }[LANG]||{};
@@ -96,6 +96,7 @@
 
   /* "zapytaj o ten typ" ustawia formularz */
   $$('[data-typ]').forEach(function(a){a.addEventListener('click',function(){var s=$('#f-typ');if(s){s.value=a.getAttribute('data-typ')}})});
+  $$('[data-bal]').forEach(function(a){a.addEventListener('click',function(){var s=$('#f-bal');if(s){s.value=a.getAttribute('data-bal')}})});
 
   /* formularze - podglad bez wysylki */
   $$('form.form').forEach(function(f){
