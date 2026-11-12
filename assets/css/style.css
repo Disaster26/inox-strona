@@ -839,4 +839,4 @@ ol.steps{list-style:none;padding:0}
   .vat-r b{font-size:32px}
 }
 @media (max-width:760px){.phero-txt .lead{margin-bottom:24px}}
-@media (max-width:760px){.phero-txt{flex:1 0 auto}}
+@media (max-width:760px){.phero-foto{max-height:none}}
