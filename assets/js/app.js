@@ -10,9 +10,9 @@
   var BASE=document.body.getAttribute('data-base')||'';
   var I=function(id){return '<svg class="ico" aria-hidden="true"><use href="#'+id+'"/></svg>'};
   var TX={
-    pl:{toShop:'Przejdź do sklepu',sent:'Dziękujemy{n}. To podgląd strony - formularz zacznie wysyłać wiadomości do biura po uruchomieniu na WordPressie.',added:'Dodano do koszyka',asked:'Dodano do zapytania',empty:'Koszyk jest pusty.',ask:'cena na zapytanie',pcs:'szt.',rm:'usuń',less:'Mniej',more:'Więcej',close:'Zamknij',prev:'Poprzednie',next:'Następne',total:'Razem',gross:'brutto',orderMsg:'To makieta zamówienia. Po uruchomieniu sklepu klient przejdzie tu do płatności (Planet Pay: BLIK, karta, Google Pay, Apple Pay, przelew online), a na e-mail dostanie potwierdzenie i kolejne statusy.'},
-    en:{toShop:'Go to the shop',sent:'Thank you{n}. This is a preview - the form will start sending messages after launch on WordPress.',added:'Added to cart',asked:'Added to inquiry',empty:'Your cart is empty.',ask:'price on request',pcs:'pcs',rm:'remove',less:'Less',more:'More',close:'Close',prev:'Previous',next:'Next',total:'Total',gross:'gross',orderMsg:'This is a checkout mock-up. After launch the customer will be redirected to payment and receive e-mail confirmations and status updates.'},
-    de:{toShop:'Zum Shop',sent:'Vielen Dank{n}. Dies ist eine Vorschau - das Formular sendet nach dem Start auf WordPress.',added:'In den Warenkorb gelegt',asked:'Zur Anfrage hinzugefügt',empty:'Der Warenkorb ist leer.',ask:'Preis auf Anfrage',pcs:'Stk.',rm:'entfernen',less:'Weniger',more:'Mehr',close:'Schließen',prev:'Zurück',next:'Weiter',total:'Summe',gross:'brutto',orderMsg:'Dies ist ein Muster der Bestellung. Nach dem Start folgt hier die Zahlung, Bestätigungen und Statusmeldungen kommen per E-Mail.'}
+    pl:{toShop:'Przejdź do sklepu',sent:'Dziękujemy{n}. To podgląd strony - formularz zacznie wysyłać wiadomości do biura po uruchomieniu na WordPressie.',added:'Dodano do koszyka',asked:'Dodano do zapytania',empty:'Koszyk jest pusty.',ask:'cena na zapytanie',pcs:'szt.',rm:'usuń',less:'Mniej',more:'Więcej',close:'Zamknij',prev:'Poprzednie',next:'Następne',total:'Razem',gross:'brutto',fail:'Nie udało się wysłać. Zadzwoń: 519 089 092 albo napisz: biuro@inox.com.pl.',orderMsg:'To makieta zamówienia. Po uruchomieniu sklepu klient przejdzie tu do płatności (Planet Pay: BLIK, karta, Google Pay, Apple Pay, przelew online), a na e-mail dostanie potwierdzenie i kolejne statusy.'},
+    en:{toShop:'Go to the shop',sent:'Thank you{n}. This is a preview - the form will start sending messages after launch on WordPress.',added:'Added to cart',asked:'Added to inquiry',empty:'Your cart is empty.',ask:'price on request',pcs:'pcs',rm:'remove',less:'Less',more:'More',close:'Close',prev:'Previous',next:'Next',total:'Total',gross:'gross',fail:'Sending failed. Please e-mail us: biuro@inox.com.pl.',orderMsg:'This is a checkout mock-up. After launch the customer will be redirected to payment and receive e-mail confirmations and status updates.'},
+    de:{toShop:'Zum Shop',sent:'Vielen Dank{n}. Dies ist eine Vorschau - das Formular sendet nach dem Start auf WordPress.',added:'In den Warenkorb gelegt',asked:'Zur Anfrage hinzugefügt',empty:'Der Warenkorb ist leer.',ask:'Preis auf Anfrage',pcs:'Stk.',rm:'entfernen',less:'Weniger',more:'Mehr',close:'Schließen',prev:'Zurück',next:'Weiter',total:'Summe',gross:'brutto',fail:'Senden fehlgeschlagen. Bitte schreiben Sie an: biuro@inox.com.pl.',orderMsg:'Dies ist ein Muster der Bestellung. Nach dem Start folgt hier die Zahlung, Bestätigungen und Statusmeldungen kommen per E-Mail.'}
   }[LANG]||{};
   var store={get:function(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
   var zl=function(n){return n.toLocaleString(LANG==='pl'?'pl-PL':(LANG==='de'?'de-DE':'en-GB'),{minimumFractionDigits:0,maximumFractionDigits:2})+' zł'};
@@ -98,13 +98,24 @@
   $$('[data-typ]').forEach(function(a){a.addEventListener('click',function(){var s=$('#f-typ');if(s){s.value=a.getAttribute('data-typ')}})});
   $$('[data-bal]').forEach(function(a){a.addEventListener('click',function(){var s=$('#f-bal');if(s){s.value=a.getAttribute('data-bal')}})});
 
-  /* formularze - podglad bez wysylki */
+  /* formularze: w WordPressie wysylka na adres z ustawien (REST + bilet antyspamowy), w podgladzie komunikat */
+  var FCFG=window.INOX_CFG||{};
+  var tk='';
+  if(FCFG.form&&$('form.form')){fetch(FCFG.form,{credentials:'same-origin'}).then(function(r){return r.json()}).then(function(j){tk=j.tk||''}).catch(function(){})}
+  /* "zapytaj o cene" z karty produktu: ?produkt=... wpisuje sie w tresc zapytania */
+  try{var qp=new URLSearchParams(location.search).get('produkt');if(qp){var ta=$('form.form textarea[name="msg"]');if(ta&&!ta.value)ta.value=qp+': '}}catch(e){}
   $$('form.form').forEach(function(f){
     f.addEventListener('submit',function(e){
       e.preventDefault();
       if(f.checkValidity&&!f.checkValidity()){f.reportValidity();return}
-      var ok=$('.f-ok',f), n=(f.elements.imie&&f.elements.imie.value.trim())||'';
-      ok.textContent=TX.sent.replace('{n}',n?', '+n:'');ok.classList.add('show');
+      var ok=$('.f-ok',f), n=(f.elements.imie&&f.elements.imie.value.trim())||'', btn=$('button[type="submit"]',f);
+      if(!FCFG.form){ok.textContent=TX.sent.replace('{n}',n?', '+n:'');ok.classList.add('show');if(window.inoxConv)window.inoxConv('form');return}
+      var fd=new FormData(f);fd.append('tk',tk);fd.append('lang',LANG);fd.append('strona',location.pathname);
+      if(btn)btn.disabled=true;ok.classList.remove('show','err');
+      fetch(FCFG.form,{method:'POST',body:fd,credentials:'same-origin'}).then(function(r){return r.json().then(function(j){return{s:r.status,j:j}})}).then(function(x){
+        ok.textContent=(x.j&&x.j.msg)||'';ok.classList.add('show');
+        if(x.j&&x.j.ok){f.reset();if(!x.j.demo&&window.inoxConv)window.inoxConv('form')}else ok.classList.add('err');
+      }).catch(function(){ok.textContent=TX.fail;ok.classList.add('show','err')}).then(function(){if(btn)btn.disabled=false});
     });
   });
 
@@ -112,6 +123,7 @@
   var toast=document.createElement('div');toast.className='toast';toast.setAttribute('role','status');document.body.appendChild(toast);var tt;
   function say(t){toast.innerHTML=I('i-check')+'<span>'+t+'</span>';toast.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('show')},2300)}
 
+  if(!document.body.hasAttribute('data-wc')){
   /* koszyk (makieta, pamiec przegladarki) */
   var cart=store.get('inox_cart')||[];
   function save(){store.set('inox_cart',cart);badge()}
@@ -163,9 +175,10 @@
     if(tot)tot.textContent=zl(sum()+(c>0?0:0))+(s&&c>0?' + '+s.getAttribute('data-l'):'');
   }
   $$('input[name="dostawa"]').forEach(function(r){r.addEventListener('change',shipUpd)});
-  var ob=$('[data-order]');if(ob)ob.addEventListener('click',function(e){e.preventDefault();var m=$('.order-msg');m.style.display='block';m.textContent=TX.orderMsg});
+  var ob=$('[data-order]');if(ob)ob.addEventListener('click',function(e){e.preventDefault();var m=$('.order-msg');m.style.display='block';m.textContent=TX.orderMsg;if(window.inoxConv)window.inoxConv('order',sum())});
   badge();renderAll();
 
+  }
   /* filtry sklepu */
   $$('.filters button').forEach(function(b){
     b.addEventListener('click',function(){
@@ -175,23 +188,42 @@
     });
   });
 
-  /* baner zgod cookies */
-  var ck=$('.ck'), CKK='inox_ck';
+  /* baner zgod cookies + tryb zgody Google (Consent Mode v2) + Google Ads */
+  var ck=$('.ck'), CKK='inox_ck', CFG=window.INOX_CFG||{}, adsOn=false;
   function ckGet(){var v=store.get(CKK);if(!v||!v.t||Date.now()-v.t>365*864e5)return null;return v}
+  function g(){if(window.gtag)window.gtag.apply(null,arguments)}
+  function adsLoad(){
+    if(adsOn||!CFG.ads)return;adsOn=true;
+    var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(CFG.ads);document.head.appendChild(s);
+    g('js',new Date());g('config',CFG.ads);
+  }
   function ckApply(v){
     $$('iframe.map').forEach(function(f){
       if(v&&!v.e){var d=document.createElement('div');d.className='map-off';d.innerHTML=f.getAttribute('data-off');f.parentNode.replaceChild(d,f)}
     });
+    if(!v)return;
+    var m=v.m?'granted':'denied';
+    g('consent','update',{ad_storage:m,ad_user_data:m,ad_personalization:m,analytics_storage:v.a?'granted':'denied'});
+    if(v.m)adsLoad();
   }
-  function ckSave(a,e){var v={a:a,e:e,t:Date.now()};store.set(CKK,v);ck.classList.remove('open','more');ckApply(v)}
+  /* konwersje Google Ads: tylko po zgodzie marketingowej, z etykieta z konta i na domenie docelowej */
+  window.inoxConv=function(k,val){
+    var lab=(CFG.conv||{})[k];var v=ckGet();
+    if(!lab||!v||!v.m||!adsOn)return false;
+    if(CFG.host&&location.hostname.replace(/^www\./,'')!==CFG.host)return false;
+    var o={send_to:CFG.ads+'/'+lab};if(val){o.value=val;o.currency='PLN'}
+    g('event','conversion',o);return true;
+  };
+  document.addEventListener('click',function(e){var a=e.target.closest('a[href^="tel:"]');if(a)window.inoxConv('tel')});
+  function ckSave(a,e,m){var v={a:a,e:e,m:m,t:Date.now()};store.set(CKK,v);ck.classList.remove('open','more');ckApply(v)}
   if(ck){
     var v=ckGet();if(!v){ck.classList.add('open')}else ckApply(v);
-    $('[data-ck="all"]',ck).onclick=function(){ckSave(true,true)};
-    $('[data-ck="min"]',ck).onclick=function(){ckSave(false,false)};
+    $('[data-ck="all"]',ck).onclick=function(){ckSave(true,true,true)};
+    $('[data-ck="min"]',ck).onclick=function(){ckSave(false,false,false)};
     $('[data-ck="more"]',ck).onclick=function(){
-      if(ck.classList.contains('more')){ckSave($('#ck-a').checked,$('#ck-e').checked)}else{ck.classList.add('more');this.textContent=this.getAttribute('data-save')}
+      if(ck.classList.contains('more')){ckSave($('#ck-a').checked,$('#ck-e').checked,$('#ck-m').checked)}else{ck.classList.add('more');this.textContent=this.getAttribute('data-save')}
     };
-    $$('[data-ck-open]').forEach(function(b){b.addEventListener('click',function(){var v=ckGet();if(v){$('#ck-a').checked=!!v.a;$('#ck-e').checked=!!v.e}ck.classList.add('open','more');$('[data-ck="more"]',ck).textContent=$('[data-ck="more"]',ck).getAttribute('data-save')})});
+    $$('[data-ck-open]').forEach(function(b){b.addEventListener('click',function(){var v=ckGet();if(v){$('#ck-a').checked=!!v.a;$('#ck-e').checked=!!v.e;$('#ck-m').checked=!!v.m}ck.classList.add('open','more');$('[data-ck="more"]',ck).textContent=$('[data-ck="more"]',ck).getAttribute('data-save')})});
   }
   $$('[data-year]').forEach(function(y){y.textContent=new Date().getFullYear()});
 })();

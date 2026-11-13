@@ -399,6 +399,7 @@ main{position:relative;display:block}
 .hp{position:absolute;left:-9999px}
 .f-ok{display:none;margin-top:16px;padding:14px 16px;background:var(--argon-l);color:var(--argon-d);border-radius:3px;font-size:15px}
 .f-ok.show{display:block}
+.f-ok.err{background:#FDECEE;color:#9B0012}
 .cdata{list-style:none;padding:0;margin:24px 0;display:grid;gap:18px}
 .cdata li{display:flex;gap:16px;align-items:flex-start}
 .cdata .ico{width:26px;height:26px;color:var(--argon);margin-top:2px}
@@ -469,6 +470,7 @@ table.tbl{border-collapse:collapse;width:100%;font-size:15px;min-width:480px}
 .tbl td.num{font-variant-numeric:tabular-nums}
 .tbl.params td:first-child{color:var(--ink2);width:42%}
 .files{display:grid;gap:10px}
+.files2{grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))}
 .file{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--line);background:#fff;text-decoration:none;color:var(--ink);position:relative;transition:border-color .2s}
 .file:hover{border-color:var(--argon)}
 .file .ico{width:26px;height:26px;color:var(--argon)}
