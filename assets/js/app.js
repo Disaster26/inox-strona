@@ -15,7 +15,7 @@
     de:{toShop:'Zum Shop',sent:'Vielen Dank{n}. Dies ist eine Vorschau - das Formular sendet nach dem Start auf WordPress.',added:'In den Warenkorb gelegt',asked:'Zur Anfrage hinzugefügt',empty:'Der Warenkorb ist leer.',ask:'Preis auf Anfrage',pcs:'Stk.',rm:'entfernen',less:'Weniger',more:'Mehr',close:'Schließen',prev:'Zurück',next:'Weiter',total:'Summe',gross:'brutto',fail:'Senden fehlgeschlagen. Bitte schreiben Sie an: biuro@inox.com.pl.',orderMsg:'Dies ist ein Muster der Bestellung. Nach dem Start folgt hier die Zahlung, Bestätigungen und Statusmeldungen kommen per E-Mail.'}
   }[LANG]||{};
   var store={get:function(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-  var zl=function(n){return n.toLocaleString(LANG==='pl'?'pl-PL':(LANG==='de'?'de-DE':'en-GB'),{minimumFractionDigits:0,maximumFractionDigits:2})+' zł'};
+  var zl=function(n){return n.toLocaleString(LANG==='pl'?'pl-PL':(LANG==='de'?'de-DE':'en-GB'),{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})+' zł'};
 
   /* menu telefonu */
   var burger=$('.burger'), panel=$('.panel');
