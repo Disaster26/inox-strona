@@ -512,6 +512,7 @@ table.tbl{border-collapse:collapse;width:100%;font-size:15px;min-width:480px}
 .opt:has(input:checked){border-color:var(--argon);background:var(--argon-l)}
 .opt input{accent-color:var(--argon);width:18px;height:18px;flex:0 0 auto}
 .opt .ico{width:24px;height:24px;color:var(--argon)}
+.opt.off{opacity:.5;cursor:not-allowed;background:var(--steel1,#f3f4f5)}.opt .why{display:block;color:var(--red,#E2001A);font-size:12.5px;margin-top:2px}
 .opt span{flex:1;min-width:0}
 .opt b{display:block;font-size:15px}
 .opt small{color:var(--ink3);font-size:13px}

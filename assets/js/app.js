@@ -175,7 +175,27 @@
     if(tot)tot.textContent=zl(sum()+(c>0?0:0))+(s&&c>0?' + '+s.getAttribute('data-l'):'');
   }
   $$('input[name="dostawa"]').forEach(function(r){r.addEventListener('change',shipUpd)});
-  var ob=$('[data-order]');if(ob)ob.addEventListener('click',function(e){e.preventDefault();var m=$('.order-msg');m.style.display='block';m.textContent=TX.orderMsg;if(window.inoxConv)window.inoxConv('order',sum())});
+  /* zamowienie: reguly dostawy (Paczkomat tylko male gabaryty, zagranica tylko kurierem, pobranie tylko w PL), NIP, walidacja */
+  var co=$('.form-co');
+  function coRules(){
+    if(!co)return;
+    var pack=(co.getAttribute('data-pack')||'').split(','),kraj=$('#z-kraj'),pl=!kraj||kraj.value==='PL';
+    var big=cart.some(function(c){return pack.indexOf(c.id)<0});
+    function opt(v,on,note){var r=$('input[value="'+v+'"]',co);if(!r)return;var l=r.closest('.opt');r.disabled=!on;l.classList.toggle('off',!on);var w=$('.why',l);if(!on&&note&&!w){w=document.createElement('small');w.className='why';$('span',l).appendChild(w)}if(w){w.textContent=on?'':note;w.hidden=on}if(!on&&r.checked){r.checked=false}}
+    opt('inpost',pl&&!big,co.getAttribute('data-msg-pack'));opt('kurier',pl);opt('zagranica',!pl);opt('pobranie',pl);
+    if(!$('input[name="dostawa"]:checked',co)){var f=$('input[name="dostawa"]:not(:disabled)',co);if(f)f.checked=true}
+    if(!$('input[name="platnosc"]:checked',co)){var g2=$('input[name="platnosc"]:not(:disabled)',co);if(g2)g2.checked=true}
+    shipUpd();
+  }
+  if(co){
+    var kr=$('#z-kraj');if(kr)kr.addEventListener('change',coRules);
+    var fv=$('#z-fv'),nw=$('#z-nip-w');if(fv&&nw)fv.addEventListener('change',function(){nw.hidden=!fv.checked;$('#z-nip').required=fv.checked});
+    coRules();
+  }
+  var ob=$('[data-order]');if(ob)ob.addEventListener('click',function(e){e.preventDefault();var m=$('.order-msg');
+    if(!cart.length){m.style.display='block';m.textContent=co.getAttribute('data-msg-empty');return}
+    if(co&&!co.checkValidity()){co.reportValidity();return}
+    m.style.display='block';m.textContent=TX.orderMsg;if(window.inoxConv)window.inoxConv('order',sum())});
   badge();renderAll();
 
   }
